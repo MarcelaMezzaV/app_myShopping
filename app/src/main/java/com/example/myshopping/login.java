@@ -126,7 +126,10 @@ public class login extends AppCompatActivity implements GoogleApiClient.OnConnec
         });
     }
 
-
+    public void irAregistro(View view) {
+        Intent login = new Intent(login.this, registrarUsuario.class);
+        startActivity(login);
+    }
     //login por google
     public void loadLoginGoogle(){
         SignInButton login_btn = (SignInButton)this.findViewById(R.id.btn_loginGoogle);

@@ -191,3 +191,102 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+    //contenido de la view list -------------------Cargando los productos-----------------------------
+    private void loadInitRestData(String key) {
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        params.add("buscar",key);
+        //String url = "http://www.omdbapi.com/?s="+key+"&page=1&apikey=1e15062a";
+        client.get(utils.LIST_PRODUCTOS_SERVICE, params, new JsonHttpResponseHandler(){
+            /* @Override
+             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                 try {
+                     JSONArray list= (JSONArray)response.get("Search");
+                     LISTINFO.clear();
+                     for (int i=0; i <= list.length();i++){
+                         JSONObject itemJson = list.getJSONObject(i);
+                         String imgPro = itemJson.getString("Poster");
+                         String title = itemJson.getString("Title");
+                         String precio = itemJson.getString("Year");
+                         String id_pro = "b"+i;
+
+
+                         ItemList item = new ItemList(imgPro, title, precio, id_pro);
+                         LISTINFO.add(item);
+                         ADAPTER.notifyDataSetChanged();
+                     }
+                     ADAPTER = new CustomAdapter(root,LISTINFO);
+                     //LIST.setAdapter(ADAPTER);
+                 } catch (JSONException e) {
+                     e.printStackTrace();
+                 }
+
+             }*/
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                LISTINFO.clear();
+                for (int i=0; i <= response.length();i++){
+                    JSONObject itemJson = null;
+                    try {
+                        itemJson = response.getJSONObject(i);
+                        String imgPro = itemJson.getString("img");
+                        String title = itemJson.getString("descripcion");
+                        String precio = itemJson.getString("precio");
+                        String id_pro = "b"+i;
+
+
+                        ItemList item = new ItemList(imgPro, title, precio, id_pro);
+                        LISTINFO.add(item);
+                        ADAPTER.notifyDataSetChanged();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    ADAPTER.notifyDataSetChanged();
+                }
+            }
+        });
+    }
+
+    private void loadComponents() {
+        //LIST = (ListView)this.findViewById(R.id.list_view_producto);
+        LIST = (GridView) this.findViewById(R.id.list_view_producto);
+        //para probar con un item
+        //LISTINFO.add(new ItemList("https://images-na.ssl-images-amazon.com/images/M/MV5BMjA4MzAyNDE1MF5BMl5BanBnXkFtZTgwODQxMjU5MzE@._V1_SX300.jpg","Titanic","2019","Acción"));
+        /*-------------escuchar el cambio de texto de un Edittext
+        EditText search = (EditText)this.findViewById(R.id.et_buscar_producto);
+        //evento al cambiar el texto
+        search.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String str = s.toString();
+                loadInitRestData(str);
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });*/
+        //LISTINFO.add(new ItemList("https://images-na.ssl-images-amazon.com/images/M/MV5BMjA4MzAyNDE1MF5BMl5BanBnXkFtZTgwODQxMjU5MzE@._V1_SX300.jpg","Titanic","45bs","1"));
+        ADAPTER = new CustomAdapter(this,LISTINFO);
+        LIST.setAdapter(ADAPTER);
+    }
+    //verificar si ya tiene el token
+    public  void inicioSesion(){
+
+        if (miToken== ""){
+            Intent login = new Intent(MainActivity.this, login.class);
+            startActivity(login);
+            return;
+        }
+    }
+
+
+}

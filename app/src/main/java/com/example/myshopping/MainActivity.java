@@ -83,3 +83,21 @@ public class MainActivity extends AppCompatActivity
 
         Bundle intentExtras = this.getIntent().getExtras();
         //String datos = intentExtras.getString("usuario");
+        //recuperando datos usuario y token del usuario logeado;
+        preferencias = getSharedPreferences("shared_login_data",   Context.MODE_PRIVATE);
+        String email = preferencias.getString("usuario", "vacio");
+        miToken = preferencias.getString("token", "");
+
+        //llamando inicioSession para verificar si existe el token y cerrar el acceso al mainActivity
+        inicioSesion();
+        userEmail.setText(email);
+        //para la listwiew----adapter
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+        root = this;
+        LISTINFO = new ArrayList<ItemList>();
+        String aux = null;
+        loadInitRestData(aux);
+        loadComponents();
+
+    }

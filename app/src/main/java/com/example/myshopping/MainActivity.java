@@ -149,3 +149,45 @@ public class MainActivity extends AppCompatActivity
 
         return super.onOptionsItemSelected(item);
     }
+//menu nav------------------------
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        switch (id){
+            case R.id.nav_home:{
+                Intent home = new Intent(this, MainActivity.class);
+                startActivity(home);
+                break;
+            }
+            case R.id.nav_logout:{
+                preferencias.edit().clear().commit();
+                //preferencias.edit().remove("usuario");
+                //preferencias.edit().commit();
+                Intent login = new Intent(this,login.class);
+                startActivity(login);
+                break;
+            }
+            case R.id.nav_registro:{
+                Intent register = new Intent(this,registrarUsuario.class);
+                startActivity(register);
+                break;
+            }
+            case R.id.nav_vender:{
+                Intent registrarProducto = new Intent(this,registrarProducto.class);
+                startActivity(registrarProducto);
+                break;
+            }
+            case R.id.nav_citas:{
+
+                break;
+            }
+        }
+
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }

@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import com.example.mitienda.listDataProducto.CustomAdapter;
 import com.example.mitienda.listDataProducto.ItemList;
+import com.example.myshopping.listDataProducto.ItemList;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;

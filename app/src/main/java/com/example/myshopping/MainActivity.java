@@ -1,4 +1,4 @@
-package com.example.mitienda;
+package com.example.myshopping;
 
 import android.content.Context;
 import android.content.Intent;

@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.example.mitienda.R;
 import com.example.mitienda.listDataProducto.ItemList;
+import com.example.myshopping.R;
 
 import java.util.ArrayList;
 

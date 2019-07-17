@@ -16,7 +16,7 @@
             android:label="@string/title_activity_registrar_usuario"
             android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
-            android:name=".listDataProducto.registrarProducto"
+            android:name=".registrarProducto"
             android:label="@string/title_activity_registrar_producto"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity

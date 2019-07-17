@@ -21,15 +21,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.mitienda.listDataProducto.CustomAdapter;
 import com.example.mitienda.listDataProducto.ItemList;
-import com.example.myshopping.listDataProducto.ItemList;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -43,7 +44,7 @@ import java.util.ArrayList;
 import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, AdapterView.OnItemClickListener {
 
     // private ListView LIST;
     private GridView LIST;
@@ -55,6 +56,8 @@ public class MainActivity extends AppCompatActivity
     private  String miToken;
     private SharedPreferences preferencias;
 
+    private ProgressBar loading;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,8 +68,8 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent registrarProducto = new Intent(MainActivity.this, registrarProducto.class);
+                startActivity(registrarProducto);
             }
         });
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -76,14 +79,14 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
+
         //verificar si ya inicio sesión
 
         //-----acceder al textview del nav
         View v = navigationView.getHeaderView(0);
         userEmail =(TextView) v.findViewById(R.id.tv_userEmail);
 
-        Bundle intentExtras = this.getIntent().getExtras();
-        //String datos = intentExtras.getString("usuario");
+
         //recuperando datos usuario y token del usuario logeado;
         preferencias = getSharedPreferences("shared_login_data",   Context.MODE_PRIVATE);
         String email = preferencias.getString("usuario", "vacio");
@@ -92,6 +95,7 @@ public class MainActivity extends AppCompatActivity
         //llamando inicioSession para verificar si existe el token y cerrar el acceso al mainActivity
         inicioSesion();
         userEmail.setText(email);
+
         //para la listwiew----adapter
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -102,6 +106,7 @@ public class MainActivity extends AppCompatActivity
         loadComponents();
 
     }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -120,7 +125,7 @@ public class MainActivity extends AppCompatActivity
         MenuItem searchItem = menu.findItem(R.id.buscar_producto);
         SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        //ebvento para escuchar el cambio del texto
+        //evento para escuchar el cambio del texto
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -136,6 +141,7 @@ public class MainActivity extends AppCompatActivity
         });
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -150,7 +156,8 @@ public class MainActivity extends AppCompatActivity
 
         return super.onOptionsItemSelected(item);
     }
-//menu nav------------------------
+
+    //menu nav------------------------
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -172,9 +179,9 @@ public class MainActivity extends AppCompatActivity
                 startActivity(login);
                 break;
             }
-            case R.id.nav_registro:{
-                Intent register = new Intent(this,registrarUsuario.class);
-                startActivity(register);
+            case R.id.nav_mis_ventas:{
+                Intent products_user = new Intent(this,productsUser.class);
+                startActivity(products_user);
                 break;
             }
             case R.id.nav_vender:{
@@ -194,7 +201,7 @@ public class MainActivity extends AppCompatActivity
     }
     //contenido de la view list -------------------Cargando los productos-----------------------------
     private void loadInitRestData(String key) {
-
+        loading = findViewById(R.id.progressBar4);
         AsyncHttpClient client = new AsyncHttpClient();
         RequestParams params = new RequestParams();
         params.add("buscar",key);
@@ -224,19 +231,25 @@ public class MainActivity extends AppCompatActivity
                  }
 
              }*/
+            @Override
+            public void onStart() {
+                loading.setVisibility(View.VISIBLE);
+            }
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                loading.setVisibility(View.GONE);
                 LISTINFO.clear();
                 for (int i=0; i <= response.length();i++){
                     JSONObject itemJson = null;
                     try {
                         itemJson = response.getJSONObject(i);
-                        String imgPro = itemJson.getString("img");
+                        String imgPro = utils.HOST + itemJson.getString("img");
                         String title = itemJson.getString("descripcion");
-                        String precio = itemJson.getString("precio");
-                        String id_pro = "b"+i;
+                        String precio ="Bs. "+ itemJson.getString("precio");
+                        String cantidad = itemJson.getString("cantidad");
+                        String id_pro = itemJson.getString("_id");
+                        String id_user = itemJson.getString("id_user");
 
-
-                        ItemList item = new ItemList(imgPro, title, precio, id_pro);
+                        ItemList item = new ItemList(imgPro, title, precio, cantidad, id_pro, id_user);
                         LISTINFO.add(item);
                         ADAPTER.notifyDataSetChanged();
                     } catch (JSONException e) {
@@ -245,6 +258,10 @@ public class MainActivity extends AppCompatActivity
 
                     ADAPTER.notifyDataSetChanged();
                 }
+            }
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                loading.setVisibility(View.GONE);
+                Toast.makeText(MainActivity.this,"Error de servidor",Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -278,6 +295,8 @@ public class MainActivity extends AppCompatActivity
         //LISTINFO.add(new ItemList("https://images-na.ssl-images-amazon.com/images/M/MV5BMjA4MzAyNDE1MF5BMl5BanBnXkFtZTgwODQxMjU5MzE@._V1_SX300.jpg","Titanic","45bs","1"));
         ADAPTER = new CustomAdapter(this,LISTINFO);
         LIST.setAdapter(ADAPTER);
+        //registrando el evento para el click en el item
+        LIST.setOnItemClickListener(this);
     }
     //verificar si ya tiene el token
     public  void inicioSesion(){
@@ -289,5 +308,24 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /*/para escuchar la seleccion del item del producto
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        String id_pro = LISTINFO.get(position).getId_pro();
+        String sendImg = LISTINFO.get(position).getImgPro();
+        String sendPrecio = LISTINFO.get(position).getPrecio();
+        String sendCantidad = LISTINFO.get(position).getCantidad();
+        String sendDescripcion = LISTINFO.get(position).getTitle();
+        String send_id_user = LISTINFO.get(position).getId_user();
 
+        Intent detallesProducto = new Intent(MainActivity.this, detallesProducto.class);
+        detallesProducto.putExtra("img",sendImg);
+        detallesProducto.putExtra("id_pro",id_pro);
+        detallesProducto.putExtra("precio",sendPrecio);
+        detallesProducto.putExtra("cantidad",sendCantidad);
+        detallesProducto.putExtra("descripcion",sendDescripcion);
+        detallesProducto.putExtra("id_user",send_id_user);
+        //Toast.makeText(this, ">>>"+sendImg,Toast.LENGTH_LONG).show();
+        startActivity(detallesProducto);*/
+    }
 }

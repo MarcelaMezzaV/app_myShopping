@@ -1,8 +1,6 @@
 package com.example.myshopping.listDataProducto;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,12 +12,9 @@ import com.bumptech.glide.Glide;
 import com.example.mitienda.R;
 import com.example.myshopping.R;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.zip.Inflater;
+
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
 public class CustomAdapter extends BaseAdapter {
 
@@ -59,8 +54,8 @@ public class CustomAdapter extends BaseAdapter {
         precio.setText(this.LIST.get(position).getPrecio());
         // type.setText(this.LIST.get(position).getType());
         //poniendo la imagen pero falta el hilo
-        ImageView img = (ImageView)convertView.findViewById(R.id.img_producto);
-        Glide.with(CONTEXT).load(LIST.get(position).getImgPro()).placeholder(R.drawable.img_default).into(img);
+        ImageView img = (ImageView)convertView.findViewById(R.id.img_productoUser);
+        Glide.with(CONTEXT).load(LIST.get(position).getImgPro()).placeholder(R.drawable.img_default).transition(withCrossFade()).into(img);
         /*try {
             URL url=new URL(this.LIST.get(position).getImgPro());
             InputStream stream =url.openConnection().getInputStream();
